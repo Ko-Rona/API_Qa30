@@ -1,12 +1,12 @@
 package contact;
 
 import com.google.gson.Gson;
+import dto.ContactDto;
 import dto.DeleteDto;
 import dto.ErrorDto;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -17,7 +17,51 @@ public class OkHttpDeleteContactById {
     final String TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Imtvcm9uYTE1MDRAZ21haWwuY29tIn0.ntJem4O2Jk_NXiuKbaqXbTBni35L8JhUb0_ThLJ_iRI";
     OkHttpClient client = new OkHttpClient();
     Gson gson = new Gson();
+    public static final MediaType JSON = MediaType.get("application/json;charset=utf-8");
+    int id;
 
+    @BeforeMethod
+    public void prRequest() throws IOException {
+
+        ContactDto requestContact = ContactDto.builder()
+                .address("address89")
+                .description("description88")
+                .email("email95@mail.com")
+                .id(0)
+                .lastName("lastName88")
+                .name("name88")
+                .phone("11223395")
+                .build();
+
+        RequestBody requestBody = RequestBody.create(gson.toJson(requestContact), JSON);
+
+        Request request = new Request.Builder()
+                .url(URL + "contact")
+                .addHeader("Authorization", TOKEN)
+                .post(requestBody)
+                .build();
+
+        Response response = client.newCall(request).execute();
+
+        ContactDto contactDto = gson.fromJson(response.body().string(), ContactDto.class);
+        id = contactDto.getId();
+    }
+
+    @Test
+    public void deleteByIdTest() throws IOException {
+        Request request = new Request.Builder()
+                .url(URL + id)
+                .delete()
+                .addHeader("Authorization", TOKEN)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        System.out.println(response.message());
+        Assert.assertTrue(response.isSuccessful());
+        DeleteDto deleteDto = gson.fromJson(response.body().string(), DeleteDto.class);
+        Assert.assertEquals(deleteDto.getStatus(), "Contact was deleted!");
+
+    }
 
     @Test
     public void deleteContactTestByIdPositive() throws IOException {

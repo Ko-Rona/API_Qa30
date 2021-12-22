@@ -44,8 +44,8 @@ public class OkHttpAddContact {
 
         Assert.assertTrue(response.isSuccessful());
         Assert.assertEquals(response.code(), 200);
-        Assert.assertEquals(contactDto.getEmail(), "email94@mail.com");
-        Assert.assertEquals(contactDto.getPhone(), "11223394");
+        Assert.assertEquals(contactDto.getEmail(), requestContact.getEmail());
+        Assert.assertEquals(contactDto.getPhone(), requestContact.getPhone());
 
     }
 
